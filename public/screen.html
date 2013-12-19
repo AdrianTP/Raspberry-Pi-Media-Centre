@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+
+<link rel="apple-touch-icon" href="images/custom_icon.png" />
+<link rel="apple-touch-startup-image" href="images/startup.png" />
+<meta name="viewport" content="width=device-width initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="apple-mobile-web-app-title" content="Remote" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+
+
+<title>Screen</title>
+
+</head>
+
+<body>
+
+<header>
+    <h1>Screen</h1>
+    <p>Hello, World!</p>
+</header>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+var clientData = {
+	"type": "screen"
+};
+
+var screen = io.connect("http://127.0.0.1:8080", { rememberTransport: false });
+
+screen.on("connecting", function(trans) {
+	console.log("connecting with " + trans);
+});
+
+screen.on("connect_failed", function() {
+	console.log("failed to connect");
+});
+
+screen.on("connect", function(data) {
+	console.log("connection established");
+	//socket.emit("screen");
+	screen.emit("identify", clientData);
+	console.log("identifying as " + clientData.type);
+});
+
+screen.on("screen already connected", function(data) {
+	document.write("Screen is already connected. Please ensure all other Screen clients are closed and try again.");
+	console.log("screen already connected");
+});
+
+screen.on("identified", function(data) {
+	if (data.type !== undefined && data.id !== undefined) {
+		console.log("received id: " + data.id);
+		console.log("successfully identified as " + data.type);
+		if (data.type === clientData.type) {
+			clientData = data;
+		}
+	}
+});
+
+screen.on("debug", function(data) {
+	console.log(data);
+});
+
+screen.on("directory listing", function(data) {
+	console.log("listing directory", data);
+});
+
+screen.on("controlling", function(data) {
+	console.log("controlling", data);
+});
+
+</script>
+
+</body>
+
+</html>

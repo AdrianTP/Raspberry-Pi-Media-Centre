@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+
+<link rel="apple-touch-icon" href="images/custom_icon.png" />
+<link rel="apple-touch-startup-image" href="images/startup.png" />
+<meta name="viewport" content="width=device-width initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="apple-mobile-web-app-title" content="Remote" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<title>Remote</title>
+
+<style>
+
+#swiper {
+    width: 100%;
+    height: 200px;
+    background-color: #000;
+}
+
+/* http://updates.html5rocks.com/2011/10/Let-Your-Content-Do-the-Talking-Fullscreen-API */
+
+body:-webkit-full-screen,
+body:-moz-full-screen {
+	width: 100% !important;
+}
+
+:-webkit-full-screen .tohide,
+:-moz-full-screen .tohide {
+	display: none; /* While in fullscreen, hide any children with class 'tohide' */
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+    <h1>Remote</h1>
+    <p>Hello again!</p>
+</header>
+
+<article id="swiper">
+    
+</article>
+
+<div id="log"></div>
+
+<ul id="buttons_menu"></ul>
+
+<ul id="buttons_media"></ul>
+
+<ul id="buttons_link"></ul>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script src="/js/quo.js"></script>
+
+<script>
+
+var scrollFix = function() {
+	window.scrollTo(0, 1);
+};
+
+document.body.onload = function() {
+	setTimeout(scrollFix, 100);
+	document.body.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+//	document.body.mozRequestFullscreen();
+//	document.body.requestFullscreen();
+};
+
+//document.webkitExitFullscreen();
+//document.mozCancelFullscreen();
+//document.exitFullscreen();
+
+var clientData = {
+	"type": "remote"
+};
+
+var remote = io.connect("http://127.0.0.1:8080", { rememberTransport: false });
+
+remote.on("connecting", function(trans) {
+	console.log("connecting with " + trans);
+});
+
+remote.on("connect_failed", function() {
+	console.log("failed to connect");
+});
+
+remote.on("connect", function(data) {
+	console.log("connection established");
+	//socket.emit("remote");
+	remote.emit("identify", clientData);
+	console.log("identifying as " + clientData.type);
+});
+
+remote.on("identified", function(data) {
+	if (data.type !== undefined && data.id !== undefined) {
+		console.log("received id: " + data.id);
+		console.log("successfully identified as " + data.type);
+		if (data.type === clientData.type) {
+			clientData = data;
+		}
+	}
+});
+
+remote.on("no screen", function(data) {
+	console.log("no screen client has been connected -- control signals will be ignored until screen is connected");
+});
+
+remote.on("debug", function(data) {
+	console.log(data);
+});
+
+remote.on("directory listing", function(data) {
+	console.log(data.files);
+});
+
+$$("#swiper").swipeLeft(function(e) {
+	e.preventDefault();
+	e.stopPropagation();
+	e.stopImmediatePropagation();
+	console.log("swipeLeft detected");
+	var log = document.getElementById("log");
+	log.innerHTML = log.innerHTML + "swiped";
+	remote.emit("control", { action: "swipeLeft" });
+});
+
+$$("#swiper").tap(function() {
+    socket.emit("control", { action: "tap" });
+});
+
+document.body.onclick = function(e) {
+	socket.emit("control", { action: "click" });
+	console.log("clicked body");
+};
+
+var announce = function(e) {
+    e.preventDefault();
+    console.log(e.type);
+};
+
+//document.ontouchstart = announce;
+//document.ontouchmove = announce;
+//document.ontouchend = announce;
+document.ontouchcancel = announce;
+
+</script>
+
+</body>
+
+</html>

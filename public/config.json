@@ -1,0 +1,59 @@
+{
+	"media": {
+		"video": [],
+		"audio": [],
+		"photo": [],
+		"types": [
+			{
+				"name": "movie",
+				"plural": "movies",
+				"extensions": [
+					"avi",
+					"mp4",
+					"mkv",
+					"mpeg",
+					"mpeg2",
+					"mpeg4",
+					"mpg"
+				]
+			},
+			{
+				"name": "episode",
+				"plural": "episodes",
+				"extensions": [
+					"avi",
+					"mp4",
+					"mkv",
+					"mpeg",
+					"mpeg2",
+					"mpeg4",
+					"mpg"
+				]
+			},
+			{
+				"name": "song",
+				"plural": "songs",
+				"extensions": [
+					"aac",
+					"aiff",
+					"mp3",
+					"ogg",
+					"wav"
+				]
+			},
+			{
+				"name": "photo",
+				"plural": "photos",
+				"extensions": [
+					"bmp",
+					"gif",
+					"jpg",
+					"jpeg",
+					"png",
+					"tif",
+					"tiff"
+				]
+			}
+		]
+	}
+}
